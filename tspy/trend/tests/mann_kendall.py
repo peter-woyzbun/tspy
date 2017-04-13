@@ -6,6 +6,13 @@ from tspy.time_series import TimeSeries
 
 
 class MannKendallTest(object):
+    """
+
+    References
+    ----------
+    http://vsp.pnnl.gov/help/Vsample/Design_Trend_Mann_Kendall.htm
+
+    """
 
     def __init__(self):
         self.results = ResultSet(name="Mann-Kendall Test")

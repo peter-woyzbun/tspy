@@ -8,11 +8,12 @@ from tspy.exceptions import TimeSeriesException
 
 class TemporalObject(object):
 
-    def __init__(self, series, freq):
+    def __init__(self, series, freq, initially_empty=False):
         if series is not None and not isinstance(series, pd.Series):
             raise TimeSeriesException
         self.series = series
         self.freq = freq
+        self.initially_empty = initially_empty
 
     def __getitem__(self, item):
         sliced_instance = copy.deepcopy(self)
@@ -71,15 +72,30 @@ class TemporalObject(object):
 
     @property
     def months(self):
+        """
+        Return a numpy array indicating the month (i.e 1,...,12) of
+        each observation.
+
+        """
         return self.series.index.month
 
     def month_ends(self):
+        """
+        Return a list containing the datetime of the end of every month
+        contained in this instance.
+
+        """
         months = self.series.index.month
         ends = np.where(months[:-1] != months[1:])[0]
         end_dates = [self.obs_date(i) for i in ends]
         return end_dates
 
     def month_starts(self):
+        """
+        Return a list containing the datetime of the start of every month
+        contained in this instance.
+
+        """
         starts = [1]
         current_month = self.months[0]
         for obs_num, month_val in enumerate(self.months):
