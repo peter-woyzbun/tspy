@@ -19,15 +19,16 @@ class PolynomialTrend(TemporalObject, RegressionMixin):
     def train(self, time_series: TimeSeries):
         self.time_series = time_series
         self._make_X(x=time_series.x())
-        print(self.X)
-        coefficients = self.linear_fit(X=self.X, y=time_series.y())
+        X = self.X
+        y = self.time_series.y()
+        coefficients = np.dot(np.dot(np.linalg.inv(np.dot(X.T, X)), X.T), y)
         print(coefficients)
         self.series = self.make_fit_values(X=self.X, coefficients=coefficients, time_series=time_series)
 
     def _make_X(self, x):
         df = pd.DataFrame({'x_0': [1] * len(x)})
         for i in range(1, self.degree + 1):
-            df['x_%s' % i] = x ** i
+            df['x_%s' % i] = np.power(x, float(i))
         self.X = df.as_matrix()
 
     def plot(self):
@@ -38,7 +39,7 @@ class PolynomialTrend(TemporalObject, RegressionMixin):
         plt.savefig('test.png')
 
 
-poly = PolynomialTrend(degree=3)
+poly = PolynomialTrend(degree=6)
 
 poly.train(time_series=female_births_ca)
 poly.plot()
