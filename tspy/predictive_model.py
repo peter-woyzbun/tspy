@@ -1,5 +1,6 @@
 from abc import abstractmethod
 import operator
+import copy
 
 from tspy.time_series import TimeSeries
 
@@ -17,7 +18,7 @@ class PredictiveModel(object):
         self.training_ts = None
 
     def copy(self):
-        pass
+        return copy.deepcopy(self)
 
     @property
     @abstractmethod
@@ -25,11 +26,11 @@ class PredictiveModel(object):
         pass
 
     @property
-    def component_residual_ts(self):
+    def component_residual_ts(self) -> TimeSeries:
         return self.training_ts - self.component_fit_ts
 
     @property
-    def residual_ts(self):
+    def residual_ts(self) -> TimeSeries:
         residuals = self.training_ts
         for model_component in self.components():
             residuals -= model_component.component_fit_ts

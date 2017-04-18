@@ -3,7 +3,11 @@ from dateutil import rrule
 
 class RecurringEvent(object):
 
+    def __new__(cls, *args, **kwargs):
+        count = kwargs.get('count')
+
     def __init__(self, freq,
+                 count=None,
                  interval=1,
                  wkst=None,
                  bysetpos=None,
