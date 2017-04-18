@@ -20,4 +20,14 @@ class TimeSeriesTests(unittest.TestCase):
         self.assertEquals(future_dt_index.min(), expected_dt)
 
     def test_get_obs(self):
-        self.assertEquals(35, female_births_ca.get_obs(number=0))
+        self.assertEquals(35, female_births_ca.get_obs_num(number=0))
+
+    def test_get_obs_num_dt(self):
+        self.assertEquals(datetime.datetime(1959, 1, 1), female_births_ca.get_obs_num_dt(0))
+
+    def test_month_starts(self):
+        test_ts = female_births_ca[0:62]
+        expected_starts = {datetime.datetime(1959, 1, 1, 0, 0, 0),
+                           datetime.datetime(1959, 2, 1, 0, 0, 0),
+                           datetime.datetime(1959, 3, 1, 0, 0, 0)}
+        self.assertEquals(expected_starts, set(test_ts.month_starts()))

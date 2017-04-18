@@ -8,9 +8,50 @@ from tspy.time_series import TimeSeries
 from tspy.result_set import ResultSet
 from tspy.datasets import female_births_ca
 from tspy.utils.stats import significance_code
+from tspy.trend.model import TrendModel
 
 
-class LinearTrend(TemporalObject):
+class LinearTrend(TrendModel):
+
+    def __init__(self):
+        TrendModel.__init__(self, model_name="Linear Trend")
+
+    @property
+    def X(self):
+        x = self.training_ts.x
+        ones = np.ones(len(x))
+        return np.concatenate(([ones], [x])).T
+
+    def _train_component(self, time_series: TimeSeries):
+        self.training_ts = time_series
+        coefficients = self.fit(X=self.X, y=self.training_ts.y)
+        y_fit = self._make_fit_values(coefficients=coefficients)
+        self._make_fit_ts(y_fit=y_fit)
+        t_values, p_values = self._calculate_coeff_stats(coefficients=coefficients)
+
+    @staticmethod
+    def fit(X, y):
+        U, S, V = np.linalg.svd(X.T.dot(X))
+        S = np.diag(S)
+        x_sq_inv = V.dot(np.linalg.pinv(S)).dot(U.T)
+        coefficients = x_sq_inv.dot(X.T).dot(y)
+        return coefficients
+
+    def _make_fit_values(self, coefficients):
+        X = self.X
+        y_fit = X.dot(coefficients)
+        return y_fit
+
+    def _calculate_coeff_stats(self, coefficients):
+        X = self.X
+        sse = np.sum((np.subtract(self.component_fit_ts.y, self.training_ts.y)) ** 2, axis=0) / float(X.shape[0] - X.shape[1])
+        se = np.array(np.sqrt(np.diagonal(sse * np.linalg.inv(np.dot(X.T, X)))))
+        t_values = coefficients / se
+        p_values = 2 * (1 - stats.t.cdf(np.abs(t_values), self.training_ts.y.shape[0] - X.shape[1]))
+        return t_values, p_values
+
+
+class LinearTrendOld(TemporalObject):
 
     # Todo: residuals, summary, summary format, clean-up.
 
