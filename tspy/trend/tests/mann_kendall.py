@@ -3,6 +3,7 @@ from scipy import stats
 
 from tspy.result_set import ResultSet
 from tspy.time_series import TimeSeries
+from tspy.datasets import female_births_ca
 
 
 class MannKendallTest(object):
@@ -58,4 +59,12 @@ class MannKendallTest(object):
         else:
             trend = 'no trend'
 
-        self.results.add_results(trend=trend, has_trend=h, p_value=p, z_value=z, S=s, n_obs=n)
+        print(h, p, s, trend)
+
+        # self.results.add_results(trend=trend, has_trend=h, p_value=p, z_value=z, S=s, n_obs=n)
+
+
+mk_test = MannKendallTest()
+
+
+mk_test.run(time_series=female_births_ca)
