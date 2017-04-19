@@ -1,9 +1,8 @@
 
 
-
-class PrescientsException(Exception):
+class TspyException(Exception):
     pass
 
 
-class TimeSeriesException(PrescientsException):
+class TimeSeriesException(TspyException):
     pass

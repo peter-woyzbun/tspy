@@ -8,11 +8,35 @@ from tspy.result_set import ResultSet
 from tspy.datasets import female_births_ca
 from tspy.utils.stats import significance_code
 from tspy.forecast.models.trend.model import TrendModel
+from tspy import result_schema
+
+
+class LinearTrendFit(result_schema.ResultSchema):
+
+    slope = result_schema.FloatField(name="Slope")
+    constant = result_schema.FloatField(name="Constant")
+    sse = result_schema.FloatField(name='SSE')
+    total_ss = result_schema.FloatField(name='total_ss')
+    residual_ss = result_schema.FloatField(name='residual_ss')
+    r2 = result_schema.FloatField(name='r2')
+    coeff_table = result_schema.TableField(name="Coefficient Estimates",
+                                           columns=('coefficient', 'estimate', 'p_value', 't_value'))
+
+    class Meta:
+        summary_title = "Linear Trend Fit Summary"
+        summary_fields = ('constant',
+                          'slope',
+                          'sse',
+                          'total_ss',
+                          'residual_ss',
+                          'r2',
+                          'coeff_table')
 
 
 class LinearTrend(TrendModel):
 
     def __init__(self):
+        self.train_fit = LinearTrendFit()
         TrendModel.__init__(self, model_name="Linear Trend")
 
     @property
@@ -24,9 +48,16 @@ class LinearTrend(TrendModel):
     def _train_component(self, time_series: TimeSeries):
         self.training_ts = time_series
         coefficients = self.fit(X=self.X, y=self.training_ts.y)
+        self.train_fit.constant = coefficients[0]
+        self.train_fit.slope = coefficients[1]
         y_fit = self._make_fit_values(coefficients=coefficients)
         self._make_fit_ts(y_fit=y_fit)
         t_values, p_values = self._calculate_coeff_stats(coefficients=coefficients)
+        self.train_fit.coeff_table.add_row(coefficient='x_0', estimate=coefficients[0],
+                                           p_value=p_values[0], t_value=t_values[0])
+        self.train_fit.coeff_table.add_row(coefficient='x_1', estimate=coefficients[1],
+                                           p_value=p_values[1], t_value=t_values[1])
+        self._calculate_fit_stats(observed_y=self.training_ts.y, fit_y=y_fit)
 
     @staticmethod
     def fit(X, y):
@@ -41,9 +72,18 @@ class LinearTrend(TrendModel):
         y_fit = X.dot(coefficients)
         return y_fit
 
+    def _calculate_fit_stats(self, observed_y, fit_y):
+        total_ss = np.sum((observed_y - np.mean(observed_y)) ** 2)
+        self.train_fit.total_ss = total_ss
+        residual_ss = np.sum((observed_y - fit_y) ** 2)
+        self.train_fit.residual_ss = residual_ss
+        r2 = 1 - (residual_ss / float(total_ss))
+        self.train_fit.r2 = r2
+
     def _calculate_coeff_stats(self, coefficients):
         X = self.X
         sse = np.sum((np.subtract(self.component_fit_ts.y, self.training_ts.y)) ** 2, axis=0) / float(X.shape[0] - X.shape[1])
+        self.train_fit.sse = float(sse)
         se = np.array(np.sqrt(np.diagonal(sse * np.linalg.inv(np.dot(X.T, X)))))
         t_values = coefficients / se
         p_values = 2 * (1 - stats.t.cdf(np.abs(t_values), self.training_ts.y.shape[0] - X.shape[1]))
@@ -101,6 +141,9 @@ class LinearTrendOld(object):
         t_values = coefficients / se
         p_values = 2 * (1 - stats.t.cdf(np.abs(t_values), self.time_series.y().shape[0] - X.shape[1]))
         return t_values, p_values
+
+
+
 
     def fit_ts(self, time_series: TimeSeries):
         pass
