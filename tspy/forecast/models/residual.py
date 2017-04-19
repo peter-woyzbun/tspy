@@ -1,4 +1,4 @@
-from tspy.predictive_model import PredictiveModel
+from tspy.forecast.models.predictive_model import PredictiveModel
 from tspy.time_series import TimeSeries
 
 

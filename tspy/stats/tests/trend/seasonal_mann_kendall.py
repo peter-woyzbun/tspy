@@ -1,5 +1,5 @@
-from tspy.trend.tests.mann_kendall import MannKendallTest
 from tspy.result_set import ResultSet
+from tspy.stats.tests.trend.mann_kendall import MannKendallTest
 from tspy.time_series import TimeSeries
 
 

@@ -3,12 +3,11 @@ import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
 
-from tspy.temporal_object import TemporalObject
 from tspy.time_series import TimeSeries
 from tspy.result_set import ResultSet
 from tspy.datasets import female_births_ca
 from tspy.utils.stats import significance_code
-from tspy.trend.model import TrendModel
+from tspy.forecast.models.trend.model import TrendModel
 
 
 class LinearTrend(TrendModel):
@@ -51,7 +50,7 @@ class LinearTrend(TrendModel):
         return t_values, p_values
 
 
-class LinearTrendOld(TemporalObject):
+class LinearTrendOld(object):
 
     # Todo: residuals, summary, summary format, clean-up.
 
@@ -60,7 +59,6 @@ class LinearTrendOld(TemporalObject):
         self.train_fit = ResultSet(name="Training")
         self.test_fit = ResultSet(name="Test")
         self.X = None
-        TemporalObject.__init__(self, series=None, freq=None)
 
     def train(self, time_series: TimeSeries):
         self.time_series = time_series

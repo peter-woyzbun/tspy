@@ -3,8 +3,8 @@ import datetime
 
 from numpy import testing as np_testing
 
-from tspy.residual import Residual
-from tspy.trend.models.linear import LinearTrend
+from tspy.forecast.models.residual import Residual
+from tspy.forecast.models.trend.models.linear import LinearTrend
 from tspy.time_series import TimeSeries
 from tspy.frequency import Day
 

@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
-from tspy.predictive_model import PredictiveModel
+from tspy.forecast.models.predictive_model import PredictiveModel
 from tspy.time_series import TimeSeries
-from tspy.residual import Residual
+from tspy.forecast.models.residual import Residual
 
 
 class InterventionModel(PredictiveModel):

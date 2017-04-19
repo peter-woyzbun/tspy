@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 from tspy.datasets import female_births_ca
-from tspy.trend.models.linear import LinearTrend
+from tspy.forecast.models.trend.models.linear import LinearTrend
 
 
 class TimeSeriesPlot(object):

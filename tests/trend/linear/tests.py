@@ -4,7 +4,7 @@ import datetime
 import numpy as np
 
 from tspy.time_series import TimeSeries
-from tspy.trend.models.linear import LinearTrend
+from tspy.forecast.models.trend.models.linear import LinearTrend
 
 
 class TestLinearTrend(unittest.TestCase):
